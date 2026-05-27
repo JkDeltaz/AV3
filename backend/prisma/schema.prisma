@@ -1,0 +1,76 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL") 
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model Aeronave {
+  id         Int     @id @default(autoincrement())
+  codigo     String  @unique
+  modelo     String
+  tipo       String  // ex: "COMERCIAL" ou "MILITAR"
+  capacidade Int
+  alcance    Int
+
+  // Relacionamentos:
+  pecas      Peca[]    // Uma aeronave pode ter várias peças associadas
+  etapas     Etapa[]   // Uma aeronave passa por várias etapas de produção
+  testes     Teste[]   // Uma aeronave possui registros de testes
+}
+
+model Peca {
+  id         Int     @id @default(autoincrement())
+  codigo     String  @unique
+  nome       String
+  tipo       String  // ex: "Nacional" ou "Importada"
+  fornecedor String
+  status     String  // ex: "Em produção", "Em transporte", "Pronta"
+
+  // Relacionamento com Aeronave (Opcional, pois a peça pode estar no inventário global antes de ir para uma aeronave)
+  aeronaveId Int?
+  aeronave   Aeronave? @relation(fields: [aeronaveId], references: [id], onDelete: Cascade)
+}
+
+model Etapa {
+  id         Int     @id @default(autoincrement())
+  codigo     String  @unique
+  nome       String
+  prazo      Int     // Prazo estimado em dias
+  status     String  // ex: "Pendente", "Em Andamento", "Concluída"
+
+  // Relacionamento com a Aeronave correspondente
+  aeronaveId Int
+  aeronave   Aeronave @relation(fields: [aeronaveId], references: [id], onDelete: Cascade)
+
+  // Relacionamento N:M com Funcionários (Substitui a lista de strings/IDs para o MySQL)
+  funcionarios Funcionario[]
+}
+
+model Teste {
+  id         Int     @id @default(autoincrement())
+  codigo     String  @unique
+  tipo       String  // ex: "Elétrico", "Hidráulico", "Aerodinâmico"
+  resultado  String  // ex: "Aprovado", "Reprovado", "Pendente"
+
+  // Relacionamento com a Aeronave testada
+  aeronaveId Int
+  aeronave   Aeronave @relation(fields: [aeronaveId], references: [id], onDelete: Cascade)
+}
+
+model Funcionario {
+  id             Int     @id @default(autoincrement())
+  codigo         String  @unique
+  nome           String
+  telefone       String
+  endereco       String
+  usuario        String  @unique
+  senha          String
+  nivelPermissao String  // ex: "Administrador", "Engenheiro", "Operador"
+
+  // Relacionamento N:M com Etapas (Diz em quais etapas este funcionário está alocado)
+  etapas         Etapa[]
+}

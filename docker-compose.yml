@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Serviço 1: Banco de Dados MySQL
+  aerocode-database:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'aerocode'
+      MYSQL_ROOT_PASSWORD: '15112006'
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # Serviço 2: API Node.js + Prisma
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - '3000:3000'
+    environment:
+      - DATABASE_URL=mysql://root:15112006@aerocode-database:3306/aerocode
+      - PORT=3000
+    depends_on:
+      - aerocode-database
+
+  # Serviço 3: Frontend React + Vite
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
