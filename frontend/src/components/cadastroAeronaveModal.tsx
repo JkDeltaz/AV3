@@ -1,114 +1,140 @@
-import { useState, type ChangeEvent, type FormEvent, type FormEventHandler, type SyntheticEvent } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, type ChangeEvent, type SyntheticEvent } from 'react'
 import '../App.css'
-import { type Aeronave } from '../data/mock_data';
+import { type Aeronave } from '../services/aeronaveApi';
 
 export interface CadastroAeronaveProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (novaAeronave: Aeronave) => void;
+  aeronave?: Aeronave;
 }
 
-function CadastroAeronaveModal({ isOpen, onClose, onSave }: CadastroAeronaveProps) {
-  if (!isOpen) return null;
-
-  const [aeronaveData, setAeronaveData] = useState<Aeronave>({
-    codigo: "",
-    modelo: "",
-    tipo: "Comercial",
+function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAeronaveProps) {
+  const initialState: Aeronave = {
+    codigo: '',
+    modelo: '',
+    tipo: 'Comercial',
     capacidade: 0,
     alcance: 0,
-    etapas: [],
     pecas: [],
-  });
+    etapas: [],
+    testes: [],
+  };
+
+  const [aeronaveData, setAeronaveData] = useState<Aeronave>(initialState);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setAeronaveData(aeronave ?? initialState);
+  }, [isOpen, aeronave]);
+
+  if (!isOpen) return null;
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
+    const parsedValue = (name === 'capacidade' || name === 'alcance') ? Number(value) : value;
 
     setAeronaveData((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: parsedValue,
     }));
   };
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const novoValor = event.target.value;
+    const novoValor = event.target.value as 'Comercial' | 'Militar';
 
     setAeronaveData((prev) => ({
-        ...prev,
-        tipo: novoValor,
+      ...prev,
+      tipo: novoValor,
     }));
   }
 
   const handleSubmit = (event: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     event.preventDefault();
-  
-    onSave({
-      ...aeronaveData,
-      codigo: aeronaveData.codigo,
-      modelo: aeronaveData.modelo,
-      tipo: aeronaveData.tipo,
-      capacidade: aeronaveData.capacidade,
-      alcance: aeronaveData.alcance
-    });
-  
+
+    onSave(aeronaveData);
     onClose();
   };
 
   const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans'
+  const isEditMode = Boolean(aeronave);
 
   return (
     <div className="bg-gray-950/60 fixed w-screen h-screen flex justify-center align-center items-center">
-        
-        <div className='bg-superficie m-8 w-1/4 h-2/3 flex flex-col justify-center align-center border border-white/10 rounded'>
-            
-            <div className='mx-8 mt-6 mb-4'>
-                <h1 className='font-mono text-3xl text-default text-center'>Cadastrar Aeronave</h1>
-            </div>
-
-            <div className='mx-8'>
-                <form onSubmit={handleSubmit}
-                className='gap-4 flex flex-col items-center'>
-
-                    <input type="text" name="codigo" placeholder="Código" onChange={handleChange} required
-                    className={inputCss}>
-                    </input>
-
-                    <input type="text" name="modelo" placeholder="Modelo" onChange={handleChange} required
-                    className={inputCss}>
-                    </input>
-
-
-                    <select name="tipo" className={inputCss} required
-                    value={aeronaveData.tipo} onChange={handleSelectChange}> 
-                        <option value="Comercial">Comercial</option>
-                        <option value="Militar">Militar</option>
-                    </select>
-
-                    <input type="number" name="capacidade" placeholder="Capacidade" onChange={handleChange}required
-                    className={inputCss}>
-                    </input>
-
-                    <input type="number" name="alcance" placeholder="Alcance" onChange={handleChange} required
-                    className={inputCss}>
-                    </input>
-
-                    <button 
-                    className='bg-primario text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl w-1/3'
-                    type='submit'>Cadastrar</button>
-                </form>
-            </div>
-
-
-            <div className='mt-auto mr-auto m-8'>
-                <button className='bg-red-500 font-sans rounded p-1.5 hover:scale-102 hover:shadow-xl cursor-pointer'
-                onClick={onClose}>
-                    Cancelar
-                </button>
-            </div>
-
+      <div className='bg-superficie m-8 w-1/4 h-2/3 flex flex-col justify-center align-center border border-white/10 rounded'>
+        <div className='mx-8 mt-6 mb-4'>
+          <h1 className='font-mono text-3xl text-default text-center'>
+            {isEditMode ? 'Editar Aeronave' : 'Cadastrar Aeronave'}
+          </h1>
         </div>
 
+        <div className='mx-8'>
+          <form onSubmit={handleSubmit} className='gap-4 flex flex-col items-center'>
+            <input
+              type="text"
+              name="codigo"
+              placeholder="Código"
+              value={aeronaveData.codigo}
+              onChange={handleChange}
+              required
+              className={inputCss}
+              disabled={isEditMode}
+            />
+            <input
+              type="text"
+              name="modelo"
+              placeholder="Modelo"
+              value={aeronaveData.modelo}
+              onChange={handleChange}
+              required
+              className={inputCss}
+            />
+            <select
+              name="tipo"
+              className={inputCss}
+              required
+              value={aeronaveData.tipo}
+              onChange={handleSelectChange}
+            >
+              <option value="Comercial">Comercial</option>
+              <option value="Militar">Militar</option>
+            </select>
+            <input
+              type="number"
+              name="capacidade"
+              placeholder="Capacidade"
+              value={aeronaveData.capacidade}
+              onChange={handleChange}
+              required
+              className={inputCss}
+            />
+            <input
+              type="number"
+              name="alcance"
+              placeholder="Alcance"
+              value={aeronaveData.alcance}
+              onChange={handleChange}
+              required
+              className={inputCss}
+            />
+            <button
+              className='bg-primario text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl w-1/3'
+              type='submit'
+            >
+              {isEditMode ? 'Salvar' : 'Cadastrar'}
+            </button>
+          </form>
+        </div>
+
+        <div className='mt-auto mr-auto m-8'>
+          <button
+            className='bg-red-500 font-sans rounded p-1.5 hover:scale-102 hover:shadow-xl cursor-pointer'
+            onClick={onClose}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
     </div>
   )
 }

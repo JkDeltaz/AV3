@@ -40,7 +40,7 @@ model Etapa {
   codigo     String  @unique
   nome       String
   prazo      Int     // Prazo estimado em dias
-  status     String  // ex: "Pendente", "Em Andamento", "Concluída"
+  status     String  // ex: "Pendente", "Em andamento", "Concluída"
 
   // Relacionamento com a Aeronave correspondente
   aeronaveId Int

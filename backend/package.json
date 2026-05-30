@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts"
+    "dev": "npx prisma generate && tsx watch src/server.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",

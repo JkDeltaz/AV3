@@ -19,9 +19,24 @@ services:
       context: ./backend
     ports:
       - '3000:3000'
+    volumes:
+      - ./backend:/app          # Espelha seu código do backend
+      - /app/node_modules
     environment:
       - DATABASE_URL=mysql://root:15112006@aerocode-database:3306/aerocode
       - PORT=3000
+    depends_on:
+      - aerocode-database
+
+  prisma-studio:
+    image: node:20-alpine
+    container_name: aerocode-prisma-studio
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    ports:
+      - "5555:5555"
+    command: npx prisma studio --port 5555
     depends_on:
       - aerocode-database
 
@@ -31,8 +46,14 @@ services:
       context: ./frontend
     ports:
       - '5173:5173'
+    volumes:
+      - ./frontend:/app         # Espelha seu código do frontend (HTML, CSS, TSX)
+      - /app/node_modules       # Protege a pasta node_modules do container
     depends_on:
       - backend
+    
+  
+  
 
 volumes:
   mysql_data:
