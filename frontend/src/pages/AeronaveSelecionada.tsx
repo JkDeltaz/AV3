@@ -6,31 +6,59 @@ import Footer from '../components/Footer';
 import NavigationComponent from '../components/Navigation';
 import Icone from '../components/Icone';
 import NovoTesteModal from '../components/novoTesteModal';
-import { type Etapa, deletarAeronave } from '../data/mock_data';
+import { aeronaveApi, type Aeronave } from '../services/aeronaveApi';
+import { type Etapa } from '../services/etapaApi';
 import { useAuth } from '../contexts/AuthContext';
 
 function AeronaveSelecionada() {
 
   const location = useLocation();
-  const aeronave = location.state?.aeronave;
+  const aeronaveParam = location.state?.aeronave;
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [aeronave, setAeronave] = useState<Aeronave | null>(aeronaveParam ?? null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { userPermission } = useAuth();
 
   const btnStyle = 'bg-primario font-sans rounded border border-white/10 p-2 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
 
-  useEffect(() => {
-    if (!userPermission || !aeronave) {
-      navigate('/login', { replace: true });
+  const carregarAeronave = async () => {
+    if (!aeronaveParam?.codigo) return;
+    try {
+      setLoading(true);
+      setError('');
+      const dados = await aeronaveApi.buscarPorCodigo(aeronaveParam.codigo);
+      setAeronave(dados);
+    } catch (err: any) {
+      setError(err?.message ?? 'Erro ao carregar aeronave');
+    } finally {
+      setLoading(false);
     }
-  }, [userPermission, aeronave, navigate]);
+  };
 
-  if (!aeronave) return null;
+  useEffect(() => {
+    if (!userPermission) {
+      navigate('/login', { replace: true });
+      return;
+    }
+    if (aeronaveParam?.codigo) {
+      carregarAeronave();
+    }
+  }, [userPermission, aeronaveParam, navigate]);
+
+  if (!userPermission || !aeronave) return null;
+  if (loading) return <div className='text-white'>Carregando...</div>;
+  if (error) return <div className='text-red-500'>Erro: {error}</div>;
+
 
   const pegarEtapaAtual = () => {
-    for (let i = aeronave.etapas.length - 1; i >= 0; i--) {
-      if (aeronave.etapas[i].status === "Em Andamento" || aeronave.etapas[i].status === "Pendente") {
-        return aeronave.etapas[i];
+
+    if (aeronave.etapas && aeronave.etapas.length > 0) {
+      for (let i = aeronave.etapas.length - 1; i >= 0; i--) {
+        if (aeronave.etapas[i].status === "Em andamento" || aeronave.etapas[i].status === "Pendente") {
+          return aeronave.etapas[i];
+        }
       }
     }
     return null;
@@ -44,10 +72,18 @@ function AeronaveSelecionada() {
     navigate("/pecasAeronave", { state: { aeronave: aeronave } });
   }
 
-  const handleDeletarAeronave = () => {
-    deletarAeronave(aeronave.codigo);
-    navigate("/dashboardAeronaves");
-  }
+  const handleDeletarAeronave = async () => {
+    if (!aeronave) return;
+    try {
+      setLoading(true);
+      await aeronaveApi.deletar(aeronave.codigo);
+      navigate("/dashboardAeronaves");
+    } catch (err: any) {
+      setError(err?.message ?? 'Erro ao deletar aeronave');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const textStyle = `font-mono text-default text-[1.3rem] truncate text-center hover:whitespace-normal hover:overflow-visible hover:text-clip"`
   const imgStyle = `scale-90 hover:scale-102 transition max-w-2/3 mb-auto`
@@ -146,7 +182,7 @@ function AeronaveSelecionada() {
                     {pegarEtapaAtual() != null ? 
                     <div className={containerStyle}>
                         <h1 className="font-mono text-default text-xl">Etapa Atual: </h1>
-                        <h1 className="font-mono text-default text-xl">{pegarEtapaAtual().nome}</h1>
+                        <h1 className="font-mono text-default text-xl">{pegarEtapaAtual()?.nome}</h1>
                     </div>
                      : 
                     <div className={containerStyle}>
@@ -154,7 +190,7 @@ function AeronaveSelecionada() {
                     </div>
                     }
                     
-                    {aeronave.etapas.length > 0 &&
+                    { aeronave.etapas && aeronave.etapas.length > 0 &&
 
                     <div className={containerStyle}>
                         <h1 className="font-mono text-default text-xl truncate hover:no-truncate">Últimas etapas: </h1>
@@ -182,7 +218,7 @@ function AeronaveSelecionada() {
             
         </div>
 
-        <NovoTesteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}/>
+        <NovoTesteModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} aeronaveId={aeronave.id} onTesteSave={carregarAeronave}/>
 
         <Footer/>
     </div>

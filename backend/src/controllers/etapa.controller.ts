@@ -104,4 +104,15 @@ export class EtapaController {
       res.status(500).json({ error: 'Erro ao deletar a etapa.', detalhe: error.message });
     }
   }
+
+  // POST - Adicionar funcionário a uma etapa
+  static async adicionarFuncionario(req: Request, res: Response): Promise<void> {
+    try {
+      const { codigo } = req.params;
+      const { funcionarioCodigo } = req.body;
+
+    } catch (error: any) {
+      res.status(500).json({ error: 'Erro ao adicionar funcionário à etapa.', detalhe: error.message });
+    }
+  }
 }

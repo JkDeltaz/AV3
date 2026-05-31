@@ -7,7 +7,7 @@ export interface Etapa {
   nome: string;
   prazo: number;
   status: 'Pendente' | 'Em andamento' | 'Concluída';
-  aeronaveId?: number | null;
+  aeronaveId: number;
   funcionarios: Funcionario[];
 }
 
@@ -35,7 +35,7 @@ export const etapaApi = {
     return response.json();
   },
 
-  atualizar: async (codigo: string, etapaAtualizada: Omit<Etapa, 'codigo'>): Promise<Etapa> => {
+  atualizar: async (codigo: string, etapaAtualizada: Partial<Omit<Etapa, 'codigo'>>): Promise<Etapa> => {
     const response = await fetch(`${API_URL}/${codigo}`, {
       method: 'PUT',
       headers: {
@@ -47,6 +47,22 @@ export const etapaApi = {
     if (!response.ok) {
       const erro = await response.json();
       throw new Error(erro.error || 'Erro ao atualizar etapa');
+    }
+    return response.json();
+  },
+
+  adicionarFuncionario: async (codigo: string, funcionarioCodigo: string): Promise<Etapa> => {
+    const response = await fetch(`${API_URL}/${codigo}/funcionarios`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ funcionarioCodigo }),
+    });
+
+    if (!response.ok) {
+      const erro = await response.json();
+      throw new Error(erro.error || 'Erro ao adicionar funcionário à etapa');
     }
     return response.json();
   },

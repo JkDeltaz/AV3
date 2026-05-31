@@ -21,9 +21,7 @@ export class PecaService {
   
   // 1. Buscar todas as peças cadastradas no MySQL
   static async buscarTodas() {
-
     const pecas = prisma.peca.findMany();
-    console.log(pecas)
     if (!pecas) {
       return [];
     }

@@ -19,6 +19,10 @@ aeronaveRoutes.post('/', AeronaveController.criar);
 // URL: PUT http://localhost:3000/api/aeronaves/:codigo
 aeronaveRoutes.put('/:codigo', AeronaveController.atualizar);
 
+// Rota para adicionar uma peça a uma aeronave
+// URL: POST http://localhost:3000/api/aeronaves/:codigo/pecas
+aeronaveRoutes.post('/:codigo/pecas', AeronaveController.adicionarPeca);
+
 // Rota para deletar uma aeronave do sistema
 // URL: DELETE http://localhost:3000/api/aeronaves/:codigo
 aeronaveRoutes.delete('/:codigo', AeronaveController.deletar);

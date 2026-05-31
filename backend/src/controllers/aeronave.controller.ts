@@ -104,4 +104,31 @@ export class AeronaveController {
       res.status(500).json({ error: 'Erro ao deletar a aeronave.', detalhe: error.message });
     }
   }
+  
+  // Adicionar uma peça a uma aeronave
+  static async adicionarPeca(req: Request, res: Response): Promise<void> {
+    try {
+      const { codigo } = req.params;
+      const { pecaCodigo } = req.body;
+
+      if (!codigo) {
+        res.status(400).json({ error: 'O parâmetro código da aeronave é obrigatório na URL.' });
+        return;
+      }
+
+      if (!pecaCodigo) {
+        res.status(400).json({ error: 'O código da peça é obrigatório no corpo da requisição.' });
+        return;
+      }
+
+      const aeronaveAtualizada = await AeronaveService.adicionarPeca(codigo, pecaCodigo);
+      res.status(200).json(aeronaveAtualizada);
+    } catch (error: any) {
+      if (error.code === 'P2025') {
+        res.status(404).json({ error: 'Aeronave ou peça não encontrada para adicionar.' });
+        return;
+      }
+      res.status(500).json({ error: 'Erro ao adicionar peça à aeronave.', detalhe: error.message });
+    }
+  }
 }

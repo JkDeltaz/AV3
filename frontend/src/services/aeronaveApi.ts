@@ -5,17 +5,25 @@ import { type Teste } from "./testeApi";
 const API_URL = 'http://localhost:3000/api/aeronaves';
 
 export interface Aeronave {
+  id?: number;
   codigo: string;
   modelo: string;
   tipo: 'Comercial' | 'Militar';
   capacidade: number;
   alcance: number;
-  pecas: Peca[];
-  etapas: Etapa[];
-  testes: Teste[];
+  pecas?: Peca[];
+  etapas?: Etapa[];
+  testes?: Teste[];
 }
 
 export const aeronaveApi = {
+  buscarPorCodigo: async (codigo: string): Promise<Aeronave> => {
+    const response = await fetch(`${API_URL}/${codigo}`);
+    if (!response.ok) throw new Error('Erro ao buscar aeronave do servidor');
+    return response.json();
+  },
+
+
   listar: async (): Promise<Aeronave[]> => {
     const response = await fetch(API_URL);
     if (!response.ok) throw new Error('Erro ao buscar aeronaves do servidor');
@@ -61,5 +69,19 @@ export const aeronaveApi = {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error('Erro ao eliminar aeronave');
+  }
+  ,
+  adicionarPeca: async (codigo: string, pecaCodigo: string) => {
+    const response = await fetch(`${API_URL}/${codigo}/pecas`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pecaCodigo }),
+    });
+
+    if (!response.ok) {
+      const erro = await response.json();
+      throw new Error(erro.error || 'Erro ao adicionar peça à aeronave');
+    }
+    return response.json();
   }
 };

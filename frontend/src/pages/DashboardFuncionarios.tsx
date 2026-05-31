@@ -3,7 +3,7 @@ import '../App.css'
 import Topbar from '../components/Topbar';
 import Footer from '../components/Footer';
 import NavigationComponent from '../components/Navigation';
-import { getFuncionarios, type Funcionario } from '../data/mock_data';
+import { funcionarioApi, type Funcionario } from '../services/funcionarioApi';
 import CadastroFuncionarioModal from '../components/CadastroFuncionarioModal';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,7 +13,7 @@ function DashboardFuncionarios() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   
-  const [funcionarios, setFuncionarios] = useState<Funcionario[]>(getFuncionarios());
+  const [funcionarios, setFuncionarios] = useState<Funcionario[]>([]);
   const [selecionado, setSelecionado] = useState<Funcionario | null>(null);
   const [editingFuncionario, setEditingFuncionario] = useState<Funcionario | null>(null);
 
@@ -30,20 +30,39 @@ function DashboardFuncionarios() {
       }
     }, [userPermission, navigate, location.pathname]);
 
+  useEffect(() => {
+    funcionarioApi.listar().then(setFuncionarios).catch(() => setFuncionarios([]));
+  }, []);
 
-  const salvarFuncionario = (funcionario: Funcionario, isEdit: boolean) => {
+
+  const salvarFuncionario = async (funcionario: Funcionario, isEdit: boolean) => {
     if (isEdit) {
-      setFuncionarios(funcionarios.map(f => f.id === funcionario.id ? funcionario : f));
+      try {
+        const atualizado = await funcionarioApi.atualizar(funcionario.codigo, funcionario as any);
+        setFuncionarios(funcionarios.map(f => f.codigo === atualizado.codigo ? atualizado : f));
+      } catch (err) {
+        console.error('Erro ao atualizar funcionário', err);
+      }
     } else {
-      setFuncionarios([...funcionarios, funcionario]);
+      try {
+        const criado = await funcionarioApi.criar(funcionario as any);
+        setFuncionarios([...funcionarios, criado]);
+      } catch (err) {
+        console.error('Erro ao criar funcionário', err);
+      }
     }
   }
 
-  const deletarFuncionario = (id: string) => {
-    setFuncionarios(funcionarios.filter(f => f.id !== id));
+  const deletarFuncionario = async (codigo: string) => {
+    try {
+      await funcionarioApi.deletar(codigo);
+      setFuncionarios(funcionarios.filter(f => f.codigo !== codigo));
+    } catch (err) {
+      console.error('Erro ao deletar funcionário', err);
+    }
   }
 
-  const funcionarioKeys = ['id', 'nome', 'telefone', 'endereco', 'usuario', 'senha', 'nivelPermissao', 'editar'];
+  const funcionarioKeys = ['codigo', 'nome', 'telefone', 'endereco', 'usuario', 'senha', 'nivelPermissao', 'editar'];
   const fieldLabels: Record<string, string> = {
     nivelPermissao: 'Cargo'
   };

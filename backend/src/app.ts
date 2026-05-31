@@ -5,6 +5,8 @@ import pecaRoutes from './routes/peca.routes.js';
 import aeronaveRoutes from './routes/aeronave.routes.js';
 import funcionarioRoutes from './routes/funcionario.routes.js';
 import etapaRoutes from './routes/etapa.routes.js';
+import testeRoutes from './routes/teste.routes.js';
+import authRoutes from './routes/auth.routes.js';
 
 dotenv.config();
 
@@ -24,11 +26,12 @@ app.use((req, res, next) => {
 });
 
 // rotas
+app.use('/api/auth', authRoutes);
 app.use('/api/pecas', pecaRoutes);
 app.use('/api/aeronaves', aeronaveRoutes);
 app.use('/api/funcionarios', funcionarioRoutes);
 app.use('/api/etapas', etapaRoutes);
-// app.use('/api/testes', testeRoutes);
+app.use('/api/testes', testeRoutes);
 
 // Rota de checagem de saúde do servidor (Healthcheck)
 app.get('/health', (req, res) => {

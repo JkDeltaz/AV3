@@ -1,7 +1,7 @@
-import { useState, type ChangeEvent, type FormEvent, type FormEventHandler, type SyntheticEvent } from 'react'
+import { useEffect, useState, type ChangeEvent } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../App.css'
-import {getPecas, type Peca } from '../data/mock_data';
+import { pecaApi, type Peca } from '../services/pecaApi';
 
 export interface AdicionarPecaProps {
   isOpen: boolean;
@@ -14,10 +14,22 @@ function AdicionarPecaModal({ isOpen, onClose, onSave }: AdicionarPecaProps) {
 
   const location = useLocation();
   const aeronave = location.state?.aeronave;
+  const [todasPecas, setTodasPecas] = useState<Peca[]>([]);
+  const [loadingPecas, setLoadingPecas] = useState(true);
 
-  const pecasSemFiltro = getPecas()
-  const pecas: Peca[] = pecasSemFiltro.filter(peca => !aeronave.pecas.includes(peca.codigo))
-  
+  useEffect(() => {
+    if (!isOpen) return;
+    setLoadingPecas(true);
+    pecaApi.listar()
+      .then(lista => setTodasPecas(lista))
+      .catch(() => setTodasPecas([]))
+      .finally(() => setLoadingPecas(false));
+  }, [isOpen]);
+
+  const pecas: Peca[] = todasPecas.filter(peca => !aeronave.pecas.includes(peca.codigo));
+
+  if (!isOpen || loadingPecas) return null;
+
   if (pecas.length === 0) {
     onClose();
     return null;

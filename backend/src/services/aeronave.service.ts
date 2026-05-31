@@ -21,20 +21,32 @@ export class AeronaveService {
   
   // 1. Buscar todas as aeronaves cadastradas no MySQL
   static async buscarTodas() {
-
-    const aeronaves = prisma.aeronave.findMany();
-    console.log(aeronaves)
-    if (!aeronaves) {
-      return [];
-    }
-
-    return await prisma.aeronave.findMany();
+    return await prisma.aeronave.findMany({
+      include: {
+        pecas: true,
+        testes: true,
+        etapas: {
+          include: {
+            funcionarios: true,
+          },
+        },
+      },
+    });
   }
 
   // 2. Buscar uma única aeronave pelo seu código único (que mapeamos no schema)
   static async buscarPorCodigo(codigo: string) {
     return await prisma.aeronave.findUnique({
-      where: { codigo }
+      where: { codigo },
+      include: {
+        pecas: true,
+        testes: true,
+        etapas: {
+          include: {
+            funcionarios: true,
+          },
+        },
+      },
     });
   }
 
@@ -63,6 +75,27 @@ export class AeronaveService {
   static async deletar(codigo: string) {
     return await prisma.aeronave.delete({
       where: { codigo }
+    });
+  }
+
+  // 6. Adicionar uma peça à aeronave (vincular por código)
+  static async adicionarPeca(codigo: string, pecaCodigo: string) {
+    return await prisma.aeronave.update({
+      where: { codigo },
+      data: {
+        pecas: {
+          connect: { codigo: pecaCodigo }
+        }
+      },
+      include: {
+        pecas: true,
+        testes: true,
+        etapas: {
+          include: {
+            funcionarios: true,
+          }
+        }
+      }
     });
   }
 }

@@ -18,27 +18,27 @@ interface AtualizarEtapaInput {
 }
 
 interface AdicionarFuncionarioInput {
-  funcionarioId: number;
+  funcionarioCodigo: string;
 }
 
 export class EtapaService {
   
   // 1. Buscar todas as etapas cadastradas no MySQL
   static async buscarTodas() {
-
-    const etapas = prisma.etapa.findMany();
-    console.log(etapas)
-    if (!etapas) {
-      return [];
-    }
-
-    return await prisma.etapa.findMany();
+    return await prisma.etapa.findMany({
+      include: {
+        funcionarios: true,
+      },
+    });
   }
 
   // 2. Buscar uma única etapa pelo seu código único (que mapeamos no schema)
   static async buscarPorCodigo(codigo: string) {
     return await prisma.etapa.findUnique({
-      where: { codigo }
+      where: { codigo },
+      include: {
+        funcionarios: true,
+      },
     });
   }
 
@@ -50,6 +50,7 @@ export class EtapaService {
         nome: dados.nome,
         prazo: dados.prazo,
         status: dados.status,
+        aeronaveId: dados.aeronaveId
       }
     });
   }
@@ -75,9 +76,12 @@ export class EtapaService {
       where: { codigo },
       data: {
         funcionarios: {
-          connect: { id: dados.funcionarioId }
+          connect: { codigo: dados.funcionarioCodigo }
         }
-      }
+      },
+      include: {
+        funcionarios: true,
+      },
     });
   }
 

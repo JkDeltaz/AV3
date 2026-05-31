@@ -21,6 +21,10 @@ etapaRoutes.post('/', EtapaController.criar);
 // URL: PUT http://localhost:3000/api/etapas/:codigo
 etapaRoutes.put('/:codigo', EtapaController.atualizar);
 
+// Rota para adicionar um funcionário a uma etapa existente
+// URL: POST http://localhost:3000/api/etapas/:codigo/funcionarios
+etapaRoutes.post('/:codigo/funcionarios', EtapaController.adicionarFuncionario);
+
 // Rota para deletar uma etapa do sistema
 // URL: DELETE http://localhost:3000/api/etapas/:codigo
 etapaRoutes.delete('/:codigo', EtapaController.deletar);

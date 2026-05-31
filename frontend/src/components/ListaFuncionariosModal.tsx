@@ -1,7 +1,7 @@
-import { useState, type ChangeEvent, type FormEvent, type FormEventHandler, type SyntheticEvent } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
 import '../App.css'
-import { getFuncionarios, type Aeronave, type Etapa, type Funcionario } from '../data/mock_data';
+import { funcionarioApi, type Funcionario } from '../services/funcionarioApi';
+import { type Etapa } from '../services/etapaApi';
 
 export interface ListaFuncionariosProps {
   isOpen: boolean;
@@ -10,10 +10,20 @@ export interface ListaFuncionariosProps {
 }
 
 function ListaFuncionariosModal({ isOpen, onClose, etapa }: ListaFuncionariosProps) {
+  const [funcionariosSemFiltro, setFuncionariosSemFiltro] = useState<Funcionario[]>([]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    funcionarioApi.listar()
+      .then(setFuncionariosSemFiltro)
+      .catch(() => setFuncionariosSemFiltro([]));
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
-  const funcionariosSemFiltro = getFuncionarios();
-  const funcionarios = etapa ? funcionariosSemFiltro.filter(funcionario => etapa.funcionarios.includes(funcionario.id)) : [];
+  const funcionarios = etapa
+    ? funcionariosSemFiltro.filter(funcionario => etapa.funcionarios.some((func) => func.codigo === funcionario.codigo))
+    : [];
 
   const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans'
 
@@ -45,19 +55,19 @@ function ListaFuncionariosModal({ isOpen, onClose, etapa }: ListaFuncionariosPro
 
                     {funcionarios.map((funcionario: Funcionario, index: number) => 
                         <div>
-                            <p className='font-mono text-default text-lg'>{funcionario.id}</p>
+                            <p className='font-mono text-default text-lg'>{funcionario.codigo}</p>
                         </div>
                     )}
                 </div>
                 {/* A Dream, I Saw a Dream */}
                 <div className='bg-fundo/20 border rounded p-2'>
                     <h1 className='font-mono text-2xl text-default'>
-                        Cargo
+                        Código
                     </h1>
 
                     {funcionarios.map((funcionario: Funcionario, index: number) => 
-                        <div>
-                            <p className='font-mono text-default text-lg'>{funcionario.nivelPermissao}</p>
+                        <div key={`codigo-${index}`}>
+                            <p className='font-mono text-default text-lg'>{funcionario.codigo}</p>
                         </div>
                     )}
                 </div>

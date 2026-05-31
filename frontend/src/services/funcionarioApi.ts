@@ -37,18 +37,18 @@ export const funcionarioApi = {
     return response.json();
   },
 
-  atualizar: async (codigo: string, etapaAtualizada: Omit<Etapa, 'codigo'>): Promise<Etapa> => {
+  atualizar: async (codigo: string, funcionarioAtualizado: Partial<Omit<Funcionario, 'codigo'>>): Promise<Funcionario> => {
     const response = await fetch(`${API_URL}/${codigo}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(etapaAtualizada),
+      body: JSON.stringify(funcionarioAtualizado),
     });
 
     if (!response.ok) {
       const erro = await response.json();
-      throw new Error(erro.error || 'Erro ao atualizar etapa');
+      throw new Error(erro.error || 'Erro ao atualizar funcionário');
     }
     return response.json();
   },

@@ -1,36 +1,51 @@
-import { useState, type ChangeEvent, type FormEvent, type FormEventHandler, type SyntheticEvent } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState, type ChangeEvent } from 'react'
 import '../App.css'
-import type { ListaFuncionariosProps } from './ListaFuncionariosModal';
-import { adicionarFuncionarioAEtapa, getFuncionarios, type Etapa, type Funcionario } from '../data/mock_data';
+import { funcionarioApi, type Funcionario } from '../services/funcionarioApi';
+import { type Etapa } from '../services/etapaApi';
 
 export interface AdicionarFuncionariosProps {
   isOpen: boolean;
   onClose: () => void;
   etapa: Etapa | null;
-  onSave: (idFuncionario: string) => void;
+  onSave: (codigoFuncionario: string) => void;
 }
 
 function AdicionarFuncionarioModal({ isOpen, onClose, etapa, onSave }: AdicionarFuncionariosProps) {
-  if (!isOpen) return null;
+  const [funcionarios, setFuncionarios] = useState<Funcionario[] | null>(null);
+  const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<Funcionario | null>(null);
 
-  const funcionariosSemFiltro = getFuncionarios()
-  const funcionarios: Funcionario[] = funcionariosSemFiltro.filter(funcionario => !etapa?.funcionarios.includes(funcionario.id))
-  
-  if (funcionarios.length === 0) {
-    onClose();
-    return null;
-  }
+  useEffect(() => {
+    if (!isOpen) return;
 
-  const [funcionarioSelecionado, setFuncionarioSelecionado] = useState<Funcionario>(funcionarios[0]);
+    funcionarioApi.listar()
+      .then((lista) => {
+        const disponiveis = lista.filter(funcionario => !etapa?.funcionarios.some((func) => func.codigo === funcionario.codigo));
+        setFuncionarios(disponiveis);
+        setFuncionarioSelecionado(disponiveis[0] ?? null);
+      })
+      .catch(() => {
+        setFuncionarios([]);
+        setFuncionarioSelecionado(null);
+      });
+  }, [isOpen, etapa]);
+
+  useEffect(() => {
+    if (!isOpen || funcionarios === null) return;
+    if (funcionarios.length === 0) {
+      onClose();
+    }
+  }, [isOpen, funcionarios, onClose]);
+
+  if (!isOpen || funcionarios === null) return null;
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const novoValor = event.target.value;
-    setFuncionarioSelecionado(funcionarios.find(f => f.id === novoValor) || funcionarioSelecionado);
+    setFuncionarioSelecionado(funcionarios.find(f => f.codigo === novoValor) ?? funcionarioSelecionado);
   }
 
   const handleAdd = () => {
-    onSave(funcionarioSelecionado.id);
+    if (!funcionarioSelecionado) return;
+    onSave(funcionarioSelecionado.codigo);
     onClose();
   }
 
@@ -49,9 +64,9 @@ function AdicionarFuncionarioModal({ isOpen, onClose, etapa, onSave }: Adicionar
                 <div className='flex flex-col items-center'>
 
                     <select name="funcionario" className={inputCss} required
-                    value={funcionarioSelecionado.id} onChange={handleChange}> 
+                    value={funcionarioSelecionado?.codigo ?? ''} onChange={handleChange}> 
                         {funcionarios.map((funcionario: Funcionario, index: number) => 
-                            <option key={index} value={funcionario.id}>{funcionario.nome} - {funcionario.nivelPermissao}</option>
+                            <option key={index} value={funcionario.codigo}>{funcionario.nome} - {funcionario.nivelPermissao}</option>
                         )}
                     </select>
 

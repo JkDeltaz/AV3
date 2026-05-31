@@ -1,7 +1,7 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent, type FormEventHandler, type SyntheticEvent } from 'react'
 import { useNavigate } from 'react-router-dom';
 import '../App.css'
-import { type Funcionario } from '../data/mock_data';
+import { type Funcionario } from '../services/funcionarioApi';
 
 export interface CadastroFuncionarioProps {
   isOpen: boolean;
@@ -15,13 +15,14 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
   if (!isOpen) return null;
 
   const [funcionarioData, setFuncionarioData] = useState<Funcionario>({
-    id: "",
+    codigo: "",
     nome: "",
     telefone: "",
     usuario: "",
     senha: "",
     endereco: "",
-    nivelPermissao: "Administrador"
+    nivelPermissao: "Administrador",
+    etapas: []
   });
 
   useEffect(() => {
@@ -29,13 +30,14 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
       setFuncionarioData(funcionario);
     } else {
       setFuncionarioData({
-        id: "",
+        codigo: "",
         nome: "",
         telefone: "",
         usuario: "",
         senha: "",
         endereco: "",
-        nivelPermissao: "Administrador"
+        nivelPermissao: "Administrador",
+        etapas: []
       });
     }
   }, [funcionario]);
@@ -97,7 +99,7 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
                         className={inputCss}>
                         </input>
 
-                        <input type="text" name="id" placeholder="ID" onChange={handleChange} {...(!funcionario && { required: true })}
+                        <input type="text" name="codigo" placeholder="Código" onChange={handleChange} {...(!funcionario && { required: true })}
                         className={inputCss}>
                         </input>
 
@@ -137,10 +139,10 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
 
             <div className='mt-auto mr-auto m-8 flex gap-4'>
                 {funcionario && onDelete && (
-                    <button className='bg-red-500 font-sans rounded p-1.5 hover:scale-102 hover:shadow-xl cursor-pointer'
-                    onClick={() => { onDelete(funcionario.id); onClose(); }}>
-                        Deletar
-                    </button>
+                  <button className='bg-red-500 font-sans rounded p-1.5 hover:scale-102 hover:shadow-xl cursor-pointer'
+                  onClick={() => { onDelete(funcionario.codigo); onClose(); }}>
+                    Deletar
+                  </button>
                 )}
                 <button className='bg-red-500 font-sans rounded p-1.5 hover:scale-102 hover:shadow-xl cursor-pointer'
                 onClick={onClose}>

@@ -1,8 +1,12 @@
-import app from './app';
+import app from './app.js';
+import { seedDatabase } from './config/seed.js';
 
 const port = process.env.PORT || 3000;
 
-// Liga o servidor de fato
-app.listen(port, () => {
-  console.log(`🚀 Servidor Aerocode rodando com sucesso em http://localhost:${port}`);
-});
+// Seed e inicia o servidor
+(async () => {
+  await seedDatabase();
+  app.listen(port, () => {
+    console.log(`🚀 Servidor Aerocode rodando com sucesso em http://localhost:${port}`);
+  });
+})();

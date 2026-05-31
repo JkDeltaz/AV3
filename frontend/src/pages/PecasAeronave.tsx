@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Topbar from '../components/Topbar';
 import Footer from '../components/Footer';
 import NavigationComponent from '../components/Navigation';
-import { adicionarPecaAAeronave, getPecas, type Peca } from '../data/mock_data';
+import { pecaApi, type Peca } from '../services/pecaApi';
+import { aeronaveApi } from '../services/aeronaveApi';
 import CadastroPecaModal from '../components/CadastroPecaModal';
 import AdicionarPecaModal from '../components/AdicionarPeca';
 import { useAuth } from '../contexts/AuthContext';
@@ -30,10 +31,17 @@ function PecasAeronave() {
   if (!aeronave) return null;
 
   const [aeronaveState, setAeronave] = useState(aeronave);
+  const [todasPecas, setTodasPecas] = useState<Peca[]>([]);
+  const [pecas, setPecas] = useState<Peca[]>([]);
 
-  let pecasFiltradas = getPecas().filter(peca => aeronave.pecas.includes(peca.codigo))
+  useEffect(() => {
+    // carregar lista completa de peças do backend
+    pecaApi.listar().then(lista => setTodasPecas(lista)).catch(() => setTodasPecas([]));
+  }, []);
 
-  const [pecas, setPecas] = useState<Peca[]>(pecasFiltradas);
+  useEffect(() => {
+    setPecas(todasPecas.filter(peca => aeronaveState.pecas.includes(peca.codigo)));
+  }, [todasPecas, aeronaveState]);
 
   const btnStyle = 'bg-primario font-sans rounded border border-white/10 p-2 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
   
@@ -42,21 +50,17 @@ function PecasAeronave() {
     setAeronave({...aeronaveState, pecas: [...aeronaveState.pecas, peca.codigo]})
     }
 
-const adicionarPeca = (codigo: string) => {
-  const peca = getPecas().find(p => p.codigo === codigo);
+const adicionarPeca = async (codigo: string) => {
+  const peca = todasPecas.find(p => p.codigo === codigo);
+  if (!peca) return;
 
-  if (peca) {
-    const novasPecasIds = [...aeronaveState.pecas, peca.codigo];
-
-    const aeronaveAtualizada = {
-      ...aeronaveState,
-      pecas: novasPecasIds
-    };
-
-    setPecas([...pecas, peca]);
+  try {
+    const aeronaveAtualizada = await aeronaveApi.adicionarPeca(aeronaveState.codigo, codigo);
+    setPecas(prev => [...prev, peca]);
     setAeronave(aeronaveAtualizada);
-
     navigate("/pecasAeronave", { state: { aeronave: aeronaveAtualizada } });
+  } catch (err: any) {
+    console.error('Erro ao adicionar peça:', err?.message ?? err);
   }
 };
 

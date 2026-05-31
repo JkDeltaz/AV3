@@ -6,7 +6,7 @@ export interface Peca {
   tipo: 'Nacional' | 'Importada';
   fornecedor: string;
   status: 'Em produção' | 'Em transporte' | 'Pronta';
-  aeronaveId?: number | null;
+  aeronaveId?: string | number | null;
 }
 
 export const pecaApi = {
