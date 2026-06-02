@@ -9,8 +9,8 @@ export interface Funcionario {
   endereco: string;
   usuario: string;
   senha: string;
-  nivelPermissao: 'Administrador' | 'Engenheiro' | 'Operário';
-  etapas: Etapa[];
+  nivelPermissao: 'Administrador' | 'Engenheiro' | 'Operador';
+  etapas?: Etapa[];
 }
 
 export const funcionarioApi = {

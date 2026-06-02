@@ -47,7 +47,7 @@ export const aeronaveApi = {
     return response.json();
   },
 
-  atualizar: async (codigo: string, aeronaveAtualizada: Omit<Aeronave, 'codigo'>): Promise<Aeronave> => {
+  atualizar: async (codigo: string, aeronaveAtualizada: Pick<Aeronave, 'modelo' | 'tipo' | 'capacidade' | 'alcance'>): Promise<Aeronave> => {
     const response = await fetch(`${API_URL}/${codigo}`, {
       method: 'PUT',
       headers: {

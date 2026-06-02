@@ -1,5 +1,5 @@
 import { useEffect, useState, type ChangeEvent } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import '../App.css'
 import { pecaApi, type Peca } from '../services/pecaApi';
 
@@ -10,12 +10,12 @@ export interface AdicionarPecaProps {
 }
 
 function AdicionarPecaModal({ isOpen, onClose, onSave }: AdicionarPecaProps) {
-  if (!isOpen) return null;
-
+  
   const location = useLocation();
   const aeronave = location.state?.aeronave;
   const [todasPecas, setTodasPecas] = useState<Peca[]>([]);
   const [loadingPecas, setLoadingPecas] = useState(true);
+  const [pecaSelecionado, setPecaSelecionado] = useState<Peca | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -26,16 +26,27 @@ function AdicionarPecaModal({ isOpen, onClose, onSave }: AdicionarPecaProps) {
       .finally(() => setLoadingPecas(false));
   }, [isOpen]);
 
-  const pecas: Peca[] = todasPecas.filter(peca => !aeronave.pecas.includes(peca.codigo));
+  // Filtrar apenas peças que NÃO estão na aeronave
+  const pecasAeronave = aeronave?.pecas || [];
+  const pecasCodigos = Array.isArray(pecasAeronave) && pecasAeronave.length > 0 && typeof pecasAeronave[0] === 'object'
+    ? pecasAeronave.map(p => p.codigo)
+    : pecasAeronave;
+  const pecas: Peca[] = todasPecas.filter(peca => !pecasCodigos.includes(peca.codigo));
 
-  if (!isOpen || loadingPecas) return null;
+  useEffect(() => {
+    if (!isOpen || loadingPecas || pecas.length === 0) return;
+    if (!pecaSelecionado && pecas.length > 0) {
+      setPecaSelecionado(pecas[0]);
+    }
+  }, [isOpen, loadingPecas, pecas, pecaSelecionado]);
 
-  if (pecas.length === 0) {
-    onClose();
-    return null;
-  }
+  useEffect(() => {
+    if (pecas.length === 0 && isOpen && !loadingPecas) {
+      onClose();
+    }
+  }, [pecas.length, isOpen, loadingPecas, onClose]);
 
-  const [pecaSelecionado, setPecaSelecionado] = useState<Peca>(pecas[0]);
+  if (!isOpen || loadingPecas || pecas.length === 0 || !pecaSelecionado) return null;
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const novoValor = event.target.value;

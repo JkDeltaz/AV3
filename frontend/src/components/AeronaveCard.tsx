@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import '../App.css'
 import Icone from './Icone';
 import { type Aeronave } from '../services/aeronaveApi';
+import { useAuth } from '../contexts/AuthContext';
 
 function AeronaveCard({
   aeronave,
@@ -18,6 +19,8 @@ function AeronaveCard({
   const handleAbrir = () => {
     navigate('/aeronaveSelecionada', { state: { aeronave } });
   };
+
+  const { userPermission } = useAuth();
 
   return (
     <div className="bg-superficie rounded border border-white/10 p-2 hover:scale-102 hover:shadow-xl transition">
@@ -43,18 +46,23 @@ function AeronaveCard({
         >
           Abrir
         </button>
-        <button
-          className='bg-primario rounded border border-white/10 p-1 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
-          onClick={() => onEdit?.(aeronave)}
-        >
-          Editar
-        </button>
-        <button
-          className='bg-red-500 rounded border border-white/10 p-1 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
-          onClick={() => onDelete?.(aeronave.codigo)}
-        >
-          Excluir
-        </button>
+
+        {userPermission != 'Operador' && (
+          <button
+            className='bg-primario rounded border border-white/10 p-1 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
+            onClick={() => onEdit?.(aeronave)}
+          >
+            Editar
+          </button>
+        )}
+        {userPermission === 'Administrador' && (
+          <button
+            className='bg-red-500 rounded border border-white/10 p-1 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
+            onClick={() => onDelete?.(aeronave.codigo)}
+          >
+            Excluir
+          </button>
+        )}
       </div>
     </div>
   )

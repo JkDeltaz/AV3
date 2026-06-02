@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent } from 'react'
+import { useEffect, useState } from 'react'
 import '../App.css'
 import { useLocation, useNavigate } from 'react-router-dom';
 import Topbar from '../components/Topbar';
@@ -13,7 +13,6 @@ import { useAuth } from '../contexts/AuthContext';
 
 function PecasAeronave() {
 
-  const [selecionado, setSelecionado] = useState(0);
   const [isCadastroOpen, setIsCadastroOpen] = useState(false);
   const [isAddOpen, setIsAddOpen] = useState(false);
   
@@ -35,34 +34,59 @@ function PecasAeronave() {
   const [pecas, setPecas] = useState<Peca[]>([]);
 
   useEffect(() => {
+    // Sincronizar aeronave com o backend ao carregar
+    aeronaveApi.buscarPorCodigo(aeronave.codigo)
+      .then(setAeronave)
+      .catch(() => console.error('Erro ao sincronizar aeronave'));
+  }, []);
+
+  useEffect(() => {
     // carregar lista completa de peças do backend
     pecaApi.listar().then(lista => setTodasPecas(lista)).catch(() => setTodasPecas([]));
   }, []);
 
   useEffect(() => {
-    setPecas(todasPecas.filter(peca => aeronaveState.pecas.includes(peca.codigo)));
+    // Filtrar peças que pertencem à aeronave atual
+    const pecasAeronave = aeronaveState.pecas || [];
+    const pecasCodigos = Array.isArray(pecasAeronave) && pecasAeronave.length > 0 && typeof pecasAeronave[0] === 'object' 
+      ? pecasAeronave.map(p => p.codigo) 
+      : pecasAeronave;
+    setPecas(todasPecas.filter(peca => pecasCodigos.includes(peca.codigo)));
   }, [todasPecas, aeronaveState]);
 
   const btnStyle = 'bg-primario font-sans rounded border border-white/10 p-2 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
   
-  const salvarPeca = (peca: Peca) => {
-    setPecas([...pecas, peca])
-    setAeronave({...aeronaveState, pecas: [...aeronaveState.pecas, peca.codigo]})
+  const salvarPeca = (pecaCriada?: Peca) => {
+    if (pecaCriada) {
+      // Se uma peça foi criada, adicionar à aeronave atualmente selecionada
+      adicionarPeca(pecaCriada.codigo);
+    } else {
+      // Apenas recarregar a lista se nenhuma peça foi criada (edição)
+      pecaApi.listar().then(lista => setTodasPecas(lista)).catch(() => setTodasPecas([]));
     }
-
-const adicionarPeca = async (codigo: string) => {
-  const peca = todasPecas.find(p => p.codigo === codigo);
-  if (!peca) return;
-
-  try {
-    const aeronaveAtualizada = await aeronaveApi.adicionarPeca(aeronaveState.codigo, codigo);
-    setPecas(prev => [...prev, peca]);
-    setAeronave(aeronaveAtualizada);
-    navigate("/pecasAeronave", { state: { aeronave: aeronaveAtualizada } });
-  } catch (err: any) {
-    console.error('Erro ao adicionar peça:', err?.message ?? err);
   }
-};
+  
+  const adicionarPeca = (pecaCodigo: string) => {
+    // Adicionar peça à aeronave via API
+    aeronaveApi.adicionarPeca(aeronaveState.codigo, pecaCodigo)
+      .then(() => {
+        // Recarregar lista completa de peças do backend para incluir novas peças criadas
+        return pecaApi.listar();
+      })
+      .then((listaAtualizada) => {
+        setTodasPecas(listaAtualizada);
+        // Buscar aeronave atualizada para sincronizar state
+        return aeronaveApi.buscarPorCodigo(aeronaveState.codigo);
+      })
+      .then((aeronaveAtualizada) => {
+        setAeronave(aeronaveAtualizada);
+        setIsAddOpen(false);
+        setIsCadastroOpen(false);
+      })
+      .catch((err) => alert('Erro ao adicionar peça: ' + err.message))
+  }
+
+
 
   return (
     <div className="bg-fundo min-h-screen overflow-x-hidden flex flex-col">
@@ -76,8 +100,8 @@ const adicionarPeca = async (codigo: string) => {
             <div className='flex flex-col gap-y-4'>
               <h1 className='font-mono text-default text-2xl'>Nome</h1>
               {pecas.map((peca: Peca, index: number) => 
-                  <div>
-                      <p className='font-mono text-default text-lg'>{peca.nome}</p>
+                  <div key={`nome-${index}`}>
+                      <p className='font-mono text-default text-lg'>{peca?.nome}</p>
                   </div>
               )}              
             </div>
@@ -85,8 +109,8 @@ const adicionarPeca = async (codigo: string) => {
             <div className='flex flex-col gap-y-4'>
               <h1 className='font-mono text-default text-2xl'>Código</h1>
               {pecas.map((peca: Peca, index: number) => 
-                  <div>
-                      <p className='font-mono text-default text-lg'>{peca.codigo}</p>
+                  <div key={`codigo-${index}`}>
+                      <p className='font-mono text-default text-lg'>{peca?.codigo}</p>
                   </div>
               )}              
             </div>
@@ -94,8 +118,8 @@ const adicionarPeca = async (codigo: string) => {
             <div className='flex flex-col gap-y-4'>
               <h1 className='font-mono text-default text-2xl'>Fornecedor</h1>
               {pecas.map((peca: Peca, index: number) => 
-                  <div>
-                      <p className='font-mono text-default text-lg'>{peca.fornecedor}</p>
+                  <div key={`fornecedor-${index}`}>
+                      <p className='font-mono text-default text-lg'>{peca?.fornecedor}</p>
                   </div>
               )}              
             </div>
@@ -103,8 +127,8 @@ const adicionarPeca = async (codigo: string) => {
             <div className='flex flex-col gap-y-4'>
               <h1 className='font-mono text-default text-2xl'>Tipo</h1>
               {pecas.map((peca: Peca, index: number) => 
-                  <div>
-                      <p className='font-mono text-default text-lg'>{peca.tipo}</p>
+                  <div key={`tipo-${index}`}>
+                      <p className='font-mono text-default text-lg'>{peca?.tipo}</p>
                   </div>
               )}              
             </div>
@@ -112,8 +136,8 @@ const adicionarPeca = async (codigo: string) => {
             <div className='flex flex-col gap-y-4'>
               <h1 className='font-mono text-default text-2xl'>Status</h1>
               {pecas.map((peca: Peca, index: number) => 
-                  <div>
-                      <p className='font-mono text-default text-lg'>{peca.status}</p>
+                  <div key={`status-${index}`}>
+                      <p className='font-mono text-default text-lg'>{peca?.status}</p>
                   </div>
               )}              
             </div>

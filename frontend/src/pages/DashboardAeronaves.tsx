@@ -61,9 +61,6 @@ function DashboardAeronaves() {
           tipo: aeronave.tipo,
           capacidade: aeronave.capacidade,
           alcance: aeronave.alcance,
-          pecas: aeronave.pecas ?? [],
-          etapas: aeronave.etapas ?? [],
-          testes: aeronave.testes ?? [],
         });
         setAeronaves((prev) => prev.map((item) => item.codigo === aeronaveAtualizada.codigo ? aeronaveAtualizada : item));
       } else {

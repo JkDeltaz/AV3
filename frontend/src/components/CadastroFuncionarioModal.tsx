@@ -12,8 +12,7 @@ export interface CadastroFuncionarioProps {
 }
 
 function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionario }: CadastroFuncionarioProps) {
-  if (!isOpen) return null;
-
+  
   const [funcionarioData, setFuncionarioData] = useState<Funcionario>({
     codigo: "",
     nome: "",
@@ -24,7 +23,7 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
     nivelPermissao: "Administrador",
     etapas: []
   });
-
+  
   useEffect(() => {
     if (funcionario) {
       setFuncionarioData(funcionario);
@@ -42,30 +41,32 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
     }
   }, [funcionario]);
 
+  if (!isOpen) return null;
+  
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
     setFuncionarioData((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: value,
     }));
   };
-
+  
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const {name, value} = event.target;
-
+    
     setFuncionarioData((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: value,
     }));
   }
-
+  
   const handleSubmit = (event: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     event.preventDefault();
-  
+    
     const isEdit = !!funcionario;
     const updatedFuncionario: Funcionario = {
-      id: isEdit ? (funcionarioData.id || funcionario.id) : funcionarioData.id,
+      codigo: isEdit ? (funcionarioData.codigo || funcionario.codigo) : funcionarioData.codigo,
       nome: isEdit ? (funcionarioData.nome || funcionario.nome) : funcionarioData.nome,
       telefone: isEdit ? (funcionarioData.telefone || funcionario.telefone) : funcionarioData.telefone,
       endereco: isEdit ? (funcionarioData.endereco || funcionario.endereco) : funcionarioData.endereco,
@@ -80,7 +81,7 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
   };
 
   const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans'
-
+  
   return (
     <div className="bg-gray-950/60 fixed w-screen h-screen flex justify-center align-center items-center">
         
@@ -99,9 +100,17 @@ function CadastroFuncionarioModal({ isOpen, onClose, onSave, onDelete, funcionar
                         className={inputCss}>
                         </input>
 
-                        <input type="text" name="codigo" placeholder="Código" onChange={handleChange} {...(!funcionario && { required: true })}
+                        {funcionario ? (
+                        <input type="text" name="codigo" placeholder="Código" value={funcionarioData.codigo} disabled
+                        className={inputCss}>
+                        </input> ) :
+
+                        ( <input type="text" name="codigo" placeholder="Código" onChange={handleChange} {...(!funcionario && { required: true })}
                         className={inputCss}>
                         </input>
+                        )
+                        }
+
 
 
                         <input type="text" name="telefone" placeholder="Telefone" onChange={handleChange} {...(!funcionario && { required: true })}

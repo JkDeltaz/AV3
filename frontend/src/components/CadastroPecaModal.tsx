@@ -5,7 +5,7 @@ import { pecaApi, type Peca } from '../services/pecaApi';
 export interface CadastroPecaProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: () => void;
+  onSave: (peca?: Peca) => void;
   peca?: Peca;
 }
 
@@ -57,11 +57,11 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
       if (isEdit && peca) {
         const { codigo: _, ...dadosAtualizados } = pecaData;
         await pecaApi.atualizar(peca.codigo, dadosAtualizados);
+        onSave();
       } else {
-        await pecaApi.criar(pecaData);
+        const pecaCriada = await pecaApi.criar(pecaData);
+        onSave(pecaCriada); // Passar a peça retornada pelo servidor
       }
-
-      onSave();
       onClose();
     } catch (error: any) {
       alert(`Falha ao salvar a peça: ${error.message}`);

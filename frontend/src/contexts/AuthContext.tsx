@@ -3,8 +3,15 @@ import { authApi, type AuthLoginResponse } from '../services/authApi';
 
 export type PermissionLevel = "Administrador" | "Engenheiro" | "Operador" | null;
 
+export interface LoggedInUser {
+  codigo: string;
+  usuario: string;
+  nivelPermissao: PermissionLevel;
+}
+
 interface AuthContextType {
     userPermission: PermissionLevel;
+    loggedInUser: LoggedInUser | null;
     login: (usuario: string, senha: string) => Promise<void>;
     logout: () => void;
 }
@@ -17,19 +24,36 @@ export function AuthProvider({children}: {children : ReactNode}) {
       return (saved as PermissionLevel) || null;
     });
 
+    const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(() => {
+      const saved = localStorage.getItem('aerocode_user');
+      return saved ? JSON.parse(saved) : null;
+    });
+
     const login = async (usuario: string, senha: string) => {
       const response: AuthLoginResponse = await authApi.login(usuario, senha);
       setUserPermission(response.nivelPermissao);
+      setLoggedInUser({
+        codigo: response.codigo,
+        usuario: response.usuario,
+        nivelPermissao: response.nivelPermissao,
+      });
       localStorage.setItem('aerocode_permission', response.nivelPermissao);
+      localStorage.setItem('aerocode_user', JSON.stringify({
+        codigo: response.codigo,
+        usuario: response.usuario,
+        nivelPermissao: response.nivelPermissao,
+      }));
     };
     
     const logout = () => {
       setUserPermission(null);
+      setLoggedInUser(null);
       localStorage.removeItem('aerocode_permission');
+      localStorage.removeItem('aerocode_user');
     };
 
     return (
-        <AuthContext.Provider value={{ userPermission, login, logout }}>
+        <AuthContext.Provider value={{ userPermission, loggedInUser, login, logout }}>
             {children}
         </AuthContext.Provider>
     )

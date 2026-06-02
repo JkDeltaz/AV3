@@ -111,7 +111,23 @@ export class EtapaController {
       const { codigo } = req.params;
       const { funcionarioCodigo } = req.body;
 
+      if (!codigo) {
+        res.status(400).json({ error: 'O parâmetro código da etapa é obrigatório na URL.' });
+        return;
+      }
+
+      if (!funcionarioCodigo) {
+        res.status(400).json({ error: 'O código do funcionário é obrigatório no corpo da requisição.' });
+        return;
+      }
+
+      const etapaAtualizada = await EtapaService.adicionarFuncionario(codigo, { funcionarioCodigo });
+      res.status(200).json(etapaAtualizada);
     } catch (error: any) {
+      if (error.code === 'P2025') {
+        res.status(404).json({ error: 'Etapa ou funcionário não encontrado para adicionar.' });
+        return;
+      }
       res.status(500).json({ error: 'Erro ao adicionar funcionário à etapa.', detalhe: error.message });
     }
   }

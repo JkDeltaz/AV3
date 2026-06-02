@@ -16,9 +16,6 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
     tipo: 'Comercial',
     capacidade: 0,
     alcance: 0,
-    pecas: [],
-    etapas: [],
-    testes: [],
   };
 
   const [aeronaveData, setAeronaveData] = useState<Aeronave>(initialState);

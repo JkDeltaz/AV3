@@ -8,7 +8,7 @@ interface CriarFuncionarioInput {
   endereco: string;
   usuario: string;
   senha: string;
-  nivelPermissao: 'Administrador'|'Engenheiro'|'Operário'
+  nivelPermissao: 'Administrador'|'Engenheiro'|'Operador'
 }
 
 // Definição da interface para atualização (torna todos os campos opcionais)
@@ -18,7 +18,7 @@ interface AtualizarFuncionarioInput {
   endereco?: string;
   usuario?: string;
   senha?: string;
-  nivelPermissao?: 'Administrador'|'Engenheiro'|'Operário'
+  nivelPermissao?: 'Administrador'|'Engenheiro'|'Operador'
 }
 
 export class FuncionarioService {

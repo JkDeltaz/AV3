@@ -65,7 +65,8 @@ export class AeronaveController {
   static async atualizar(req: Request, res: Response): Promise<void> {
     try {
       const { codigo } = req.params;
-      const dadosAtualizados = req.body;
+      const { modelo, tipo, capacidade, alcance } = req.body;
+      const dadosAtualizados = { modelo, tipo, capacidade, alcance };
 
       if (!codigo) {
         res.status(400).json({ error: 'O parâmetro código é obrigatório na URL.' });

@@ -67,7 +67,16 @@ export class AeronaveService {
   static async atualizar(codigo: string, dados: AtualizarAeronaveInput) {
     return await prisma.aeronave.update({
       where: { codigo },
-      data: dados
+      data: dados,
+      include: {
+        pecas: true,
+        testes: true,
+        etapas: {
+          include: {
+            funcionarios: true,
+          },
+        },
+      },
     });
   }
 

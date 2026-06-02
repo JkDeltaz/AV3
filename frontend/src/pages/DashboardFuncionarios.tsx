@@ -19,7 +19,7 @@ function DashboardFuncionarios() {
 
   const btnStyle = 'bg-primario font-sans rounded border border-white/10 p-2 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
 
-  const { userPermission } = useAuth();
+  const { userPermission, loggedInUser } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,8 +31,14 @@ function DashboardFuncionarios() {
     }, [userPermission, navigate, location.pathname]);
 
   useEffect(() => {
-    funcionarioApi.listar().then(setFuncionarios).catch(() => setFuncionarios([]));
-  }, []);
+    funcionarioApi.listar()
+      .then(lista => {
+        const funcionariosFiltered = lista.filter(f => f.codigo !== loggedInUser?.codigo);
+        setFuncionarios(funcionariosFiltered);
+      })
+      .catch(() => setFuncionarios([]));
+  }, [loggedInUser?.codigo]);
+
 
 
   const salvarFuncionario = async (funcionario: Funcionario, isEdit: boolean) => {
@@ -84,20 +90,24 @@ function DashboardFuncionarios() {
                   <div key={idx}>
                     {property === 'editar' ? (
                       <button className='mt-0.5 font-default bg-primario px-4 font-mono border border-white/10 rounded cursor-pointer' onClick={() => { setEditingFuncionario(funcionario); setIsModalOpen(true); }}>Editar</button>
-                    ) : property != 'senha' ? (
-                      <p className='font-mono text-default text-lg truncate hover:whitespace-normal hover:overflow-visible hover:text-clip'>
-
-                        {funcionario[property as keyof Funcionario]}
+                    ) : (() => {
+                      const raw = funcionario[property as keyof Funcionario] as any;
+                      const display = Array.isArray(raw) ? raw.join(', ') : (raw ?? '').toString();
+                      if (property !== 'senha') {
+                        return (
+                          <p className='font-mono text-default text-lg truncate hover:whitespace-normal hover:overflow-visible hover:text-clip'>
+                            {display}
+                          </p>
+                        );
+                      }
+                      return (
+                        <p className='font-mono text-default text-lg truncate hover:whitespace-normal hover:overflow-visible hover:text-clip cursor-pointer'
+                          onClick={() => selecionado != funcionario ? setSelecionado(funcionario) : setSelecionado(null)}
+                        >
+                          {selecionado == funcionario ? display : "*********"}
                         </p>
-                      ) : (
-                      <p className='font-mono text-default text-lg truncate hover:whitespace-normal hover:overflow-visible hover:text-clip cursor-pointer'
-                      onClick={() => selecionado != funcionario ? setSelecionado(funcionario) : setSelecionado(null)}
-                      >
-
-                        {selecionado == funcionario ? funcionario[property as keyof Funcionario] : "*********"}
-                        </p>
-                      
-                    )}
+                      );
+                    })()}
 
                   </div>
               )}              
