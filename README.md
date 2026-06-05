@@ -1,9 +1,3 @@
-Aqui está um modelo completo e profissional de arquivo `README.md` estruturado em Markdown para o seu projeto **Aerocode**.
-
-Ele já contempla toda a arquitetura que desenvolvemos (React, Vite, Tailwind, Node.js, Express, Docker Compose, Prisma e MySQL) e inclui as instruções claras de como rodar o ambiente com Hot Reload e como visualizar as métricas de performance para o relatório da faculdade.
-
-Você pode criar um arquivo chamado `README.md` na raiz do seu projeto e colar o conteúdo abaixo:
-
 ```markdown
 # Aerocode ✈️
 
