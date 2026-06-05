@@ -42,7 +42,7 @@ cd AV3
 
 ### 2. Configurar as Variáveis de Ambiente
 
-Edite o arquivo `backend/.env` com a senha do banco de dados:
+Crie o arquivo `backend/.env` com a senha do banco de dados:
 
 ```env
 DATABASE_URL="mysql://root:senha@aerocode-database:3306/aerocode?connection_limit=10&pool_timeout=0"
