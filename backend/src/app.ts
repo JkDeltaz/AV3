@@ -14,10 +14,10 @@ dotenv.config();
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173', // URL do seu frontend React/Vite
+  origin: 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-client-timestamp'], // <-- ADICIONE O SEU HEADER AQUI!
-  exposedHeaders: ['x-server-processing-time'] // Garante que o front consiga ler a resposta
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-client-timestamp'],
+  exposedHeaders: ['x-server-processing-time']
 }));
 
 

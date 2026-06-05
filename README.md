@@ -121,7 +121,7 @@ docker compose exec backend npx prisma generate
 
 ## 👨‍💻 Autor
 
-* **Caio Santos** - *Desenvolvedor Full-Stack* - [JkDeltaz](https://github.com/JkDeltaz)
+* **Caio Santos** - [JkDeltaz](https://github.com/JkDeltaz)
 * **Instituição:** Fatec São José dos Campos (Fatec SJC)
 
 

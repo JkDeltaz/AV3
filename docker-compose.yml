@@ -7,23 +7,22 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: 'aerocode'
-      MYSQL_ROOT_PASSWORD: '15112006'
+      MYSQL_ROOT_PASSWORD: 'suasenha'
     ports:
       - '3307:3306'
     volumes:
       - mysql_data:/var/lib/mysql
 
-  # Serviço 2: API Node.js + Prisma
   backend:
     build:
       context: ./backend
     ports:
       - '3000:3000'
     volumes:
-      - ./backend:/app          # Espelha seu código do backend
+      - ./backend:/app         
       - /app/node_modules
     environment:
-      - DATABASE_URL=mysql://root:15112006@aerocode-database:3306/aerocode
+      - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
       - PORT=3000
     depends_on:
       - aerocode-database
@@ -47,13 +46,11 @@ services:
     ports:
       - '5173:5173'
     volumes:
-      - ./frontend:/app         # Espelha seu código do frontend (HTML, CSS, TSX)
-      - /app/node_modules       # Protege a pasta node_modules do container
+      - ./frontend:/app        
+      - /app/node_modules       
     depends_on:
       - backend
     
-  
-  
 
 volumes:
   mysql_data:
