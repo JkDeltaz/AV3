@@ -1,4 +1,3 @@
-```markdown
 # Aerocode ✈️
 
 O **Aerocode** é um sistema moderno de gerenciamento de aeronaves e componentes (peças), desenvolvido como projeto acadêmico para a **Fatec São José dos Campos (Fatec SJC)**. A aplicação foi projetada com foco em uma interface de usuário fluida e de alta performance, permitindo o controle de inventário, acompanhamento de etapas de manutenção e monitoramento de métricas de infraestrutura em tempo real.
