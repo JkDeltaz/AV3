@@ -31,16 +31,16 @@ function NovoTesteModal({ isOpen, onClose, aeronaveId, onTesteSave }: novoTesteP
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setTesteData((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: value,
     }));
   };
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     const { name, value } = event.target;
     setTesteData((prev) => ({
-        ...prev,
-        [name]: value,
+      ...prev,
+      [name]: value,
     }));
   };
 
@@ -65,55 +65,55 @@ function NovoTesteModal({ isOpen, onClose, aeronaveId, onTesteSave }: novoTesteP
 
   return (
     <div className="bg-gray-950/60 fixed w-screen h-screen flex justify-center align-center items-center">
-        
-        <div className='bg-superficie w-1/4 h-auto flex flex-col justify-center align-center border border-white/10 rounded'>
-            
-            <div className='mx-8 mt-6 mb-4'>
-                <h1 className='font-mono text-3xl text-default text-center'>Novo Teste</h1>
-            </div>
 
-            <div className='mx-8 mb-4'>
-                <form className='flex flex-col items-center gap-4'>
+      <div className='bg-superficie w-1/4 h-auto flex flex-col justify-center align-center border border-white/10 rounded'>
 
-                    <input type="text" name="codigo" placeholder="Código" value={testeData.codigo} onChange={handleChange} required
-                    className={inputCss}>
-                    </input>
-
-                    <select name="tipo" className={inputCss} required
-                    value={testeData.tipo} onChange={handleSelectChange}> 
-                        <option value="Elétrico">Elétrico</option>
-                        <option value="Hidráulico">Hidráulico</option>
-                        <option value="Aerodinâmico">Aerodinâmico</option>
-                    </select>
-
-                    {error && <div className='text-red-500 text-sm'>{error}</div>}
-                </form>
-
-                <div className='mt-4 flex flex-1 items-center justify-center gap-2'>
-                  <button
-                  className='bg-red-500 text-default text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl flex-1'
-                  type='button'
-                  disabled={loading}
-                  onClick={() => handleSubmit('Reprovado')}
-                  >Reprovado</button>
-
-                  <button 
-                  className='bg-primario text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl flex-1'
-                  type='button'
-                  disabled={loading}
-                  onClick={() => handleSubmit('Aprovado')}
-                  >Aprovado</button>
-                </div>
-            </div>
-
-            <div className='mb-4 mx-8'>
-                <button className='bg-gray-600 font-sans rounded p-1.5 hover:scale-102 hover:shadow-xl cursor-pointer w-full'
-                onClick={onClose}>
-                    Cancelar
-                </button>
-            </div>
-
+        <div className='mx-8 mt-6 mb-4'>
+          <h1 className='font-mono text-3xl text-default text-center'>Novo Teste</h1>
         </div>
+
+        <div className='mx-8 mb-4'>
+          <form className='flex flex-col items-center gap-4'>
+
+            <input type="text" name="codigo" placeholder="Código" value={testeData.codigo} onChange={handleChange} required
+              className={inputCss}>
+            </input>
+
+            <select name="tipo" className={inputCss} required
+              value={testeData.tipo} onChange={handleSelectChange}>
+              <option value="Elétrico">Elétrico</option>
+              <option value="Hidráulico">Hidráulico</option>
+              <option value="Aerodinâmico">Aerodinâmico</option>
+            </select>
+
+            {error && <div className='text-red-500 text-sm'>{error}</div>}
+          </form>
+
+          <div className='mt-4 flex flex-1 items-center justify-center gap-2'>
+            <button
+              className='bg-red-500 text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl flex-1'
+              type='button'
+              disabled={loading}
+              onClick={() => handleSubmit('Reprovado')}
+            >Reprovado</button>
+
+            <button
+              className='bg-primario text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl flex-1'
+              type='button'
+              disabled={loading}
+              onClick={() => handleSubmit('Aprovado')}
+            >Aprovado</button>
+          </div>
+        </div>
+
+        <div className='mb-4 mx-8'>
+          <button className='bg-gray-600 font-sans rounded p-1.5 hover:scale-102 hover:shadow-xl cursor-pointer w-full'
+            onClick={onClose}>
+            Cancelar
+          </button>
+        </div>
+
+      </div>
 
     </div>
   )

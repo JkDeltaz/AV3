@@ -107,7 +107,7 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
     }
   };
 
-  const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans';
+  const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans mb-2';
   const isEditMode = Boolean(etapa);
 
   return (
@@ -118,8 +118,12 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
         </div>
 
         <div className='mx-8'>
-          <form onSubmit={handleSubmit} className='gap-4 flex flex-col items-center'>
+          <form onSubmit={handleSubmit} className='flex flex-col items-center'>
+            <label htmlFor="codigo" className="font-mono text-default self-start">
+              Código
+            </label>
             <input
+              id="codigo"
               type="text"
               name="codigo"
               placeholder="Código"
@@ -130,7 +134,11 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
               disabled={isEditMode}
             />
 
+            <label htmlFor="nome" className="font-mono text-default self-start">
+              Nome
+            </label>
             <input
+              id="nome"
               type="text"
               name="nome"
               placeholder="Nome"
@@ -140,17 +148,29 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
               className={inputCss}
             />
 
+            <label htmlFor="prazo" className="font-mono text-default self-start">
+              Prazo (Dias)
+            </label>
             <input
+              id="prazo"
               type="number"
               name="prazo"
               placeholder="Prazo (Dias)"
               value={etapaData.prazo}
               onChange={handleChange}
               required
-              className={inputCss}
+              className={inputCss + 'mt-0'}
+              min="1"
+              onInput={(event) => {
+                event.currentTarget.value = Math.abs(Number(event.currentTarget.value)).toString();
+              }}
             />
 
+            <label htmlFor="status" className="font-mono text-default self-start">
+              Status
+            </label>
             <select
+              id="status"
               name="status"
               className={inputCss}
               required

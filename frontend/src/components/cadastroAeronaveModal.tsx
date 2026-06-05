@@ -53,12 +53,12 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
     onClose();
   };
 
-  const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans'
+  const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans mb-2'
   const isEditMode = Boolean(aeronave);
 
   return (
     <div className="bg-gray-950/60 fixed w-screen h-screen flex justify-center align-center items-center">
-      <div className='bg-superficie m-8 w-1/4 h-2/3 flex flex-col justify-center align-center border border-white/10 rounded'>
+      <div className='bg-superficie m-8 w-1/3 h-4/5 flex flex-col justify-center align-center border border-white/10 rounded'>
         <div className='mx-8 mt-6 mb-4'>
           <h1 className='font-mono text-3xl text-default text-center'>
             {isEditMode ? 'Editar Aeronave' : 'Cadastrar Aeronave'}
@@ -66,8 +66,12 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
         </div>
 
         <div className='mx-8'>
-          <form onSubmit={handleSubmit} className='gap-4 flex flex-col items-center'>
+          <form onSubmit={handleSubmit} className='flex flex-col items-center'>
+            <label htmlFor="codigo" className="font-mono text-default self-start">
+              Código
+            </label>
             <input
+              id="codigo"
               type="text"
               name="codigo"
               placeholder="Código"
@@ -77,7 +81,11 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
               className={inputCss}
               disabled={isEditMode}
             />
+            <label htmlFor="modelo" className="font-mono text-default self-start">
+              Modelo
+            </label>
             <input
+              id="modelo"
               type="text"
               name="modelo"
               placeholder="Modelo"
@@ -86,7 +94,11 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
               required
               className={inputCss}
             />
+            <label htmlFor="tipo" className="font-mono text-default self-start">
+              Tipo
+            </label>
             <select
+              id="tipo"
               name="tipo"
               className={inputCss}
               required
@@ -96,7 +108,11 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
               <option value="Comercial">Comercial</option>
               <option value="Militar">Militar</option>
             </select>
+            <label htmlFor="capacidade" className="font-mono text-default self-start">
+              Capacidade
+            </label>
             <input
+              id="capacidade"
               type="number"
               name="capacidade"
               placeholder="Capacidade"
@@ -104,8 +120,16 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
               onChange={handleChange}
               required
               className={inputCss}
+              min="1"
+              onInput={(event) => {
+                event.currentTarget.value = Math.abs(Number(event.currentTarget.value)).toString();
+              }}
             />
+            <label htmlFor="alcance" className="font-mono text-default self-start">
+              Alcance
+            </label>
             <input
+              id="alcance"
               type="number"
               name="alcance"
               placeholder="Alcance"
@@ -113,6 +137,10 @@ function CadastroAeronaveModal({ isOpen, onClose, onSave, aeronave }: CadastroAe
               onChange={handleChange}
               required
               className={inputCss}
+              min="1"
+              onInput={(event) => {
+                event.currentTarget.value = Math.abs(Number(event.currentTarget.value)).toString();
+              }}
             />
             <button
               className='bg-primario text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl w-1/3'

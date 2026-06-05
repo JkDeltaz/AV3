@@ -21,19 +21,45 @@ export class PecaService {
   
   // 1. Buscar todas as peças cadastradas no MySQL
   static async buscarTodas() {
-    const pecas = prisma.peca.findMany();
-    if (!pecas) {
-      return [];
-    }
+    const pecas = await prisma.peca.findMany({
+      include: {
+        aeronave: {
+          select: {
+            codigo: true
+          }
+        }
+      }
+    });
 
-    return await prisma.peca.findMany();
+    return pecas.map((peca) => {
+      const { aeronave, ...rest } = peca as any;
+      return {
+        ...rest,
+        aeronaveCodigo: aeronave?.codigo ?? null,
+      };
+    });
   }
 
   // 2. Buscar uma única peça pelo seu código único (que mapeamos no schema)
   static async buscarPorCodigo(codigo: string) {
-    return await prisma.peca.findUnique({
-      where: { codigo }
+    const peca = await prisma.peca.findUnique({
+      where: { codigo },
+      include: {
+        aeronave: {
+          select: {
+            codigo: true
+          }
+        }
+      }
     });
+
+    if (!peca) return null;
+
+    const { aeronave, ...rest } = peca as any;
+    return {
+      ...rest,
+      aeronaveCodigo: aeronave?.codigo ?? null,
+    };
   }
 
   // 3. Inserir uma nova peça no banco de dados

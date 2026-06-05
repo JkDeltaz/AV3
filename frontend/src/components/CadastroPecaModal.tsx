@@ -18,8 +18,7 @@ const initialPecaData: Peca = {
 };
 
 function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps) {
-  if (!isOpen) return null;
-
+  
   const [pecaData, setPecaData] = useState<Peca>(initialPecaData);
   const [carregando, setCarregando] = useState(false);
 
@@ -30,7 +29,8 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
       setPecaData(initialPecaData);
     }
   }, [peca]);
-
+  
+  if (!isOpen) return null;
   const isEdit = Boolean(peca);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -70,25 +70,7 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
     }
   };
 
-  const handleDelete = async () => {
-    if (!peca) return;
-
-    const confirmado = window.confirm('Tem certeza que deseja deletar esta peça?');
-    if (!confirmado) return;
-
-    setCarregando(true);
-    try {
-      await pecaApi.deletar(peca.codigo);
-      onSave();
-      onClose();
-    } catch (error: any) {
-      alert(`Falha ao deletar a peça: ${error.message}`);
-    } finally {
-      setCarregando(false);
-    }
-  };
-
-  const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans text-gray-900';
+  const inputCss = 'rounded bg-gray-300 p-2 pl-3 w-full font-sans text-gray-900 mb-2';
 
   return (
     <div className="bg-gray-950/60 fixed w-screen h-screen flex justify-center items-center z-50">
@@ -100,8 +82,12 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
         </div>
 
         <div className='mx-8'>
-          <form onSubmit={handleSubmit} className='gap-4 flex flex-col items-center'>
+          <form onSubmit={handleSubmit} className='flex flex-col items-center'>
+            <label htmlFor="nome" className="font-mono text-default self-start">
+              Nome
+            </label>
             <input
+              id="nome"
               type="text"
               name="nome"
               placeholder="Nome"
@@ -112,7 +98,11 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
               disabled={carregando}
             />
 
+            <label htmlFor="codigo" className="font-mono text-default self-start">
+              Código
+            </label>
             <input
+              id="codigo"
               type="text"
               name="codigo"
               placeholder="Código"
@@ -123,7 +113,11 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
               disabled={carregando || isEdit}
             />
 
+            <label htmlFor="tipo" className="font-mono text-default self-start">
+              Tipo
+            </label>
             <select
+              id="tipo"
               name="tipo"
               className={inputCss}
               required
@@ -135,7 +129,11 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
               <option value="Importada">Importada</option>
             </select>
 
+            <label htmlFor="fornecedor" className="font-mono text-default self-start">
+              Fornecedor
+            </label>
             <input
+              id="fornecedor"
               type="text"
               name="fornecedor"
               placeholder="Fornecedor"
@@ -146,7 +144,11 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
               disabled={carregando}
             />
 
+            <label htmlFor="status" className="font-mono text-default self-start">
+              Status
+            </label>
             <select
+              id="status"
               name="status"
               className={inputCss}
               required
@@ -170,15 +172,6 @@ function CadastroPecaModal({ isOpen, onClose, onSave, peca }: CadastroPecaProps)
         </div>
 
         <div className='mt-auto mr-auto m-8 flex gap-3'>
-          {isEdit && (
-            <button
-              className='bg-red-500 font-sans rounded p-2 hover:scale-102 hover:shadow-xl cursor-pointer disabled:opacity-50'
-              onClick={handleDelete}
-              disabled={carregando}
-            >
-              Deletar
-            </button>
-          )}
           <button
             className='bg-red-500  font-sans rounded p-2 hover:scale-102 hover:shadow-xl cursor-pointer disabled:opacity-50'
             onClick={onClose}

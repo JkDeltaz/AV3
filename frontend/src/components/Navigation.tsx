@@ -10,8 +10,8 @@ function NavigationComponent({ openModal }: {openModal: () => void}) {
 
   const aeronave = location.state?.aeronave;
 
-  const defaultBtn = 'bg-fundo pt-2 pb-2 text-2xl rounded font-mono border-2 border-superficie cursor-pointer text-default min-w-1/10 text-center hover:scale-102 hover:shadow-xl transition'
-  const selectedBtn = 'bg-primario pt-2 pb-2 text-2xl rounded font-mono border-2 border-superficie cursor-pointer min-w-1/10 text-center hover:scale-102 hover:shadow-xl transition'
+  const defaultBtn = 'bg-fundo pt-2 pb-2 text-2xl rounded font-mono border-2 border-superficie cursor-pointer text-default min-w-1/9 text-center hover:scale-102 hover:shadow-xl transition'
+  const selectedBtn = 'bg-primario pt-2 pb-2 text-2xl rounded font-mono border-2 border-superficie cursor-pointer min-w-1/9 text-center hover:scale-102 hover:shadow-xl transition'
 
   const { userPermission } = useAuth();
 
@@ -44,6 +44,16 @@ function NavigationComponent({ openModal }: {openModal: () => void}) {
         Aeronaves
         </NavLink>
 
+        {userPermission && (
+          <NavLink 
+              to="/minhasEtapas"
+              className={({ isActive }) => 
+                  isActive ? selectedBtn : defaultBtn
+            + 'm'}
+          >
+          Minhas Etapas
+          </NavLink>
+        )}
 
         <NavLink 
             to="/dashboardPecas"

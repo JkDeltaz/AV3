@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import DashboardAeronaves from './pages/DashboardAeronaves';
 import DashboardFuncionarios from './pages/DashboardFuncionarios';
 import DashboardPecas from './pages/DashboardPecas';
+import MinhasEtapas from './pages/MinhasEtapas';
 import './App.css'
 import AeronaveSelecionada from './pages/AeronaveSelecionada';
 import EtapaSelecionada from './pages/EtapaSelecionada';
@@ -19,6 +20,7 @@ function App() {
       <Route path="/aeronaveSelecionada" element={<AeronaveSelecionada />} />
       <Route path="/etapaSelecionada" element={<EtapaSelecionada />} />
       <Route path="/pecasAeronave" element={<PecasAeronave />} />
+      <Route path="/minhasEtapas" element={<MinhasEtapas />} />
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
 

@@ -55,14 +55,6 @@ function AeronaveCard({
             Editar
           </button>
         )}
-        {userPermission === 'Administrador' && (
-          <button
-            className='bg-red-500 rounded border border-white/10 p-1 px-4 cursor-pointer hover:scale-102 hover:shadow-xl'
-            onClick={() => onDelete?.(aeronave.codigo)}
-          >
-            Excluir
-          </button>
-        )}
       </div>
     </div>
   )

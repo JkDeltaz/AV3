@@ -7,25 +7,24 @@ import funcionarioRoutes from './routes/funcionario.routes.js';
 import etapaRoutes from './routes/etapa.routes.js';
 import testeRoutes from './routes/teste.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import { monitorarPerformance } from './middlewares/performance.middleware.js';
 
 dotenv.config();
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // URL do seu frontend React/Vite
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-client-timestamp'], // <-- ADICIONE O SEU HEADER AQUI!
+  exposedHeaders: ['x-server-processing-time'] // Garante que o front consiga ler a resposta
+}));
+
+
 app.use(express.json()); 
 
-app.use((req, res, next) => {
-  const inicio = performance.now();
-  res.on('finish', () => {
-    const fim = performance.now();
-    const tempo = (fim - inicio).toFixed(2);
-    console.log(`[MÉTRICA AV3] ${req.method} ${req.url} - Processado em ${tempo}ms`);
-  });
-  next();
-});
-
 // rotas
+app.use(monitorarPerformance);
 app.use('/api/auth', authRoutes);
 app.use('/api/pecas', pecaRoutes);
 app.use('/api/aeronaves', aeronaveRoutes);

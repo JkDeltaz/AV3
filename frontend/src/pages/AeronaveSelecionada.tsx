@@ -72,8 +72,80 @@ function AeronaveSelecionada() {
     navigate("/pecasAeronave", { state: { aeronave: aeronave } });
   }
 
+  const handleGerarRelatorio = () => {
+    if (!aeronave) return;
+
+    const formatEtapas = () => {
+      if (!aeronave.etapas || aeronave.etapas.length === 0) {
+        return 'Nenhuma etapa cadastrada.\n';
+      }
+      return aeronave.etapas.map((etapa, index) => {
+        const funcionarios = (etapa.funcionarios && etapa.funcionarios.length > 0)
+          ? etapa.funcionarios.map(func => `        - ${func.nome} (${func.nivelPermissao})`).join('\n')
+          : '        Nenhum funcionário alocado.';
+
+        return [
+          `  Etapa ${index + 1}: ${etapa.nome}`,
+          `    Código: ${etapa.codigo}`,
+          `    Status: ${etapa.status}`,
+          `    Prazo: ${etapa.prazo}`,
+          `    Funcionários:`,
+          funcionarios,
+          ''
+        ].join('\n');
+      }).join('\n');
+    };
+
+    const formatPecas = () => {
+      if (!aeronave.pecas || aeronave.pecas.length === 0) {
+        return 'Nenhuma peça cadastrada.\n';
+      }
+      return aeronave.pecas.map((peca, index) => [
+        `  Peça ${index + 1}: ${peca.nome}`,
+        `    Código: ${peca.codigo}`,
+        `    Tipo: ${peca.tipo}`,
+        `    Fornecedor: ${peca.fornecedor}`,
+        `    Status: ${peca.status}`,
+        `    Aeronave Código: ${peca.aeronave?.codigo ?? peca.aeronaveId ?? 'N/A'}`,
+        ''
+      ].join('\n')).join('\n');
+    };
+
+    const reportLines = [
+      'RELATÓRIO DE AERONAVE',
+      '=====================',
+      `Código: ${aeronave.codigo}`,
+      `Modelo: ${aeronave.modelo}`,
+      `Tipo: ${aeronave.tipo}`,
+      `Capacidade: ${aeronave.capacidade}`,
+      `Alcance: ${aeronave.alcance}`,
+      '',
+      'PEÇAS',
+      '-----',
+      formatPecas(),
+      'ETAPAS',
+      '------',
+      formatEtapas(),
+    ];
+
+    const reportContent = reportLines.join('\n');
+    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `relatorio_aeronave_${aeronave.codigo}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  };
+
   const handleDeletarAeronave = async () => {
     if (!aeronave) return;
+    const confirmado = window.confirm('Tem certeza que deseja deletar esta aeronave?');
+    if (!confirmado) return;
+
     try {
       setLoading(true);
       await aeronaveApi.deletar(aeronave.codigo);
@@ -158,6 +230,7 @@ function AeronaveSelecionada() {
                         </button>  
 
                         <button className={btnStyle}
+                          onClick={handleGerarRelatorio}
                         >
                         Gerar Relatório
                         </button>  
