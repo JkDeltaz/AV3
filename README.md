@@ -49,19 +49,33 @@ DATABASE_URL="mysql://root:senha@aerocode-database:3306/aerocode?connection_limi
 PORT=3000
 ```
 
-E no `docker-compose.yml`, certifique-se de que a senha do campo `MYSQL_ROOT_PASSWORD` seja **idêntica** à usada na `DATABASE_URL` acima:
+E no `docker-compose.yml`, certifique-se de que a senha dos campos `MYSQL_ROOT_PASSWORD` e `DATABASE_URL` seja **idêntica** à usada na `DATABASE_URL` do .env acima:
 
 ```yaml
-aerocode-database:
-  image: mysql:8.0
-  restart: always
-  environment:
-    MYSQL_DATABASE: 'aerocode'
-    MYSQL_ROOT_PASSWORD: 'senha'   # deve ser igual à senha no .env
-  ports:
-    - '3307:3306'
-  volumes:
-    - mysql_data:/var/lib/mysql
+  aerocode-database:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'aerocode'
+      MYSQL_ROOT_PASSWORD: 'suasenha'
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./backend:/app         
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
+      - PORT=3000
+    depends_on:
+      - aerocode-database
 ```
 
 ### 3. Inicializar os Containers
