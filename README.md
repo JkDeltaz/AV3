@@ -218,6 +218,8 @@ Esses registros podem ser visualizados diretamente na interface web após o logi
 
 A aplicação possui um middleware de APM (*Application Performance Monitoring*) integrado ao backend. Ele mede o tempo de processamento real do servidor via cabeçalho HTTP `x-server-processing-time` e permite isolar os três componentes de desempenho definidos no relatório de qualidade.
 
+[Relatório de qualidade em PDF](https://github.com/JkDeltaz/AV3/blob/main/docs/Relatorio_Qualidade_Aerocode.pdf)
+
 ### Definição das Métricas
 
 | Métrica | Descrição | Como é obtida |
