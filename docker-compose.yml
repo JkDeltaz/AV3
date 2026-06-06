@@ -12,6 +12,12 @@ services:
       - '3307:3306'
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -u root -pSuasenha -e 'SELECT 1;' aerocode"]
+      timeout: 5s
+      retries: 10
+      interval: 5s
+      start_period: 15s 
 
   backend:
     build:
@@ -24,8 +30,10 @@ services:
     environment:
       - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
       - PORT=3000
+    command: sh -c "npx prisma db push && npm run dev"
     depends_on:
-      - aerocode-database
+      aerocode-database:
+        condition: service_healthy
 
   prisma-studio:
       image: node:20-alpine
@@ -40,7 +48,8 @@ services:
         - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
       command: sh -c "npm install && npx prisma generate && npx prisma studio --port 5555"
       depends_on:
-        - aerocode-database
+        aerocode-database:
+          condition: service_healthy
 
   # Serviço 3: Frontend React + Vite
   frontend:

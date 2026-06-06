@@ -49,11 +49,9 @@ DATABASE_URL="mysql://root:senha@aerocode-database:3306/aerocode?connection_limi
 PORT=3000
 ```
 
-E no `docker-compose.yml`, certifique-se de que a senha dos campos `MYSQL_ROOT_PASSWORD` e `DATABASE_URL` seja **idêntica** à usada na `DATABASE_URL` do .env acima:
+E no `docker-compose.yml`, certifique-se de que a senha dos campos `MYSQL_ROOT_PASSWORD` , `DATABASE_URL` , `healthcheck` sejam **idênticos** à usada na `DATABASE_URL` do .env acima:
 
 ```yaml
-services:
-  # Serviço 1: Banco de Dados MySQL
   aerocode-database:
     image: mysql:8.0
     restart: always
@@ -64,6 +62,12 @@ services:
       - '3307:3306'
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -u root -pSuasenha -e 'SELECT 1;' aerocode"]
+      timeout: 5s
+      retries: 10
+      interval: 5s
+      start_period: 15s 
 
   backend:
     build:
@@ -76,8 +80,10 @@ services:
     environment:
       - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
       - PORT=3000
+    command: sh -c "npx prisma db push && npm run dev"
     depends_on:
-      - aerocode-database
+      aerocode-database:
+        condition: service_healthy
 
   prisma-studio:
       image: node:20-alpine
@@ -92,7 +98,8 @@ services:
         - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
       command: sh -c "npm install && npx prisma generate && npx prisma studio --port 5555"
       depends_on:
-        - aerocode-database
+        aerocode-database:
+          condition: service_healthy
 ```
 
 ### 3. Inicializar os Containers
