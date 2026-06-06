@@ -28,16 +28,19 @@ services:
       - aerocode-database
 
   prisma-studio:
-    image: node:20-alpine
-    container_name: aerocode-prisma-studio
-    working_dir: /app
-    volumes:
-      - ./backend:/app
-    ports:
-      - "5555:5555"
-    command: npx prisma studio --port 5555
-    depends_on:
-      - aerocode-database
+      image: node:20-alpine
+      container_name: aerocode-prisma-studio
+      working_dir: /app
+      volumes:
+        - ./backend:/app
+        - /app/node_modules 
+      ports:
+        - "5555:5555"
+      environment:
+        - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
+      command: sh -c "npm install && npx prisma generate && npx prisma studio --port 5555"
+      depends_on:
+        - aerocode-database
 
   # Serviço 3: Frontend React + Vite
   frontend:

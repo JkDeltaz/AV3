@@ -52,6 +52,8 @@ PORT=3000
 E no `docker-compose.yml`, certifique-se de que a senha dos campos `MYSQL_ROOT_PASSWORD` e `DATABASE_URL` seja **idêntica** à usada na `DATABASE_URL` do .env acima:
 
 ```yaml
+services:
+  # Serviço 1: Banco de Dados MySQL
   aerocode-database:
     image: mysql:8.0
     restart: always
@@ -76,6 +78,21 @@ E no `docker-compose.yml`, certifique-se de que a senha dos campos `MYSQL_ROOT_P
       - PORT=3000
     depends_on:
       - aerocode-database
+
+  prisma-studio:
+      image: node:20-alpine
+      container_name: aerocode-prisma-studio
+      working_dir: /app
+      volumes:
+        - ./backend:/app
+        - /app/node_modules 
+      ports:
+        - "5555:5555"
+      environment:
+        - DATABASE_URL=mysql://root:suasenha@aerocode-database:3306/aerocode
+      command: sh -c "npm install && npx prisma generate && npx prisma studio --port 5555"
+      depends_on:
+        - aerocode-database
 ```
 
 ### 3. Inicializar os Containers
