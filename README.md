@@ -185,6 +185,35 @@ ports:
 
 ---
 
+## 👤 Usuários de Acesso
+
+Os seguintes usuários são criados automaticamente pelo sistema na primeira inicialização (seed do banco de dados):
+
+| Usuário | Senha | Permissão |
+|:---|:---|:---|
+| `admin` | `admin123` | Administrador |
+| `engenheiro` | `engenheiro123` | Engenheiro |
+| `operador` | `operador123` | Operador |
+
+### Descrição das Permissões
+
+- **Administrador** — acesso total ao sistema, incluindo gerenciamento de usuários, aeronaves, peças, etapas e testes.
+- **Engenheiro** — acesso de leitura e escrita nas entidades técnicas (aeronaves, peças, etapas e testes), sem acesso ao gerenciamento de usuários.
+- **Operador** — acesso de leitura ao sistema à maior parte do sistema, podendo apenas gerenciar parcialmente etapas, peças e testes.
+
+---
+
+## 🌱 Dados Iniciais (Seed)
+
+Ao subir o ambiente pela primeira vez, o sistema popula automaticamente o banco de dados com um conjunto inicial de dados para facilitar a navegação e os testes:
+
+- **1 aeronave** cadastrada como exemplo
+- **1 peça** vinculada a essa aeronave
+- **1 etapa de produção** associada à mesma aeronave
+
+Esses registros podem ser visualizados diretamente na interface web após o login ou pelo Prisma Studio em `http://localhost:5555`.
+
+
 ## 📊 Relatório de Qualidade — Métricas de Desempenho
 
 A aplicação possui um middleware de APM (*Application Performance Monitoring*) integrado ao backend. Ele mede o tempo de processamento real do servidor via cabeçalho HTTP `x-server-processing-time` e permite isolar os três componentes de desempenho definidos no relatório de qualidade.
