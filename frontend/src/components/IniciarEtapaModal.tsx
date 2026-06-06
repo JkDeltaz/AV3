@@ -65,15 +65,6 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
     }));
   };
 
-  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    const novoValor = event.target.value as 'Pendente' | 'Em andamento' | 'Concluída';
-
-    setEtapaData((prev) => ({
-      ...prev,
-      status: novoValor,
-    }));
-  }
-
   const handleSubmit = async (event: SyntheticEvent<HTMLFormElement, SubmitEvent>) => {
     event.preventDefault();
 
@@ -90,7 +81,7 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
         await etapaApi.atualizar(etapa.codigo, {
           nome: etapaData.nome,
           prazo: etapaData.prazo,
-          status: etapaData.status,
+          status: 'Pendente',
           funcionarios: etapaData.funcionarios,
           aeronaveId: aeronave?.id ?? aeronaveId,
         });
@@ -112,7 +103,7 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
 
   return (
     <div className="bg-gray-950/60 fixed w-screen h-screen flex justify-center align-center items-center">
-      <div className='bg-superficie m-8 w-1/4 h-2/3 flex flex-col justify-center align-center border border-white/10 rounded'>
+      <div className='bg-superficie m-8 w-1/4 h-3/5 flex flex-col justify-center align-center border border-white/10 rounded'>
         <div className='mx-8 mt-6 mb-4'>
           <h1 className='font-mono text-3xl text-default text-center'>{isEditMode ? 'Editar Etapa' : 'Iniciar Etapa'}</h1>
         </div>
@@ -166,26 +157,10 @@ function IniciarEtapaModal({ isOpen, onClose, onSave, aeronaveId, etapa }: Inici
               }}
             />
 
-            <label htmlFor="status" className="font-mono text-default self-start">
-              Status
-            </label>
-            <select
-              id="status"
-              name="status"
-              className={inputCss}
-              required
-              value={etapaData.status}
-              onChange={handleSelectChange}
-            >
-              <option value="Pendente">Pendente</option>
-              <option value="Em andamento">Em Andamento</option>
-              <option value="Concluída">Concluída</option>
-            </select>
-
             {error && <div className='text-red-500'>{error}</div>}
 
             <button
-              className='bg-primario text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl w-1/3'
+              className='bg-primario text-xl p-2 font-mono border border-white/10 rounded cursor-pointer hover:scale-102 hover:shadow-xl w-1/3 mt-4'
               type='submit'
               disabled={loading}
             >
